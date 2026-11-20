@@ -24,10 +24,11 @@ import uuid
 
 sys.dont_write_bytecode = True
 import bpy
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1])); import testenv
 
 ROOT = Path(__file__).resolve().parents[2]
 OUTPUTS = ROOT / 'test_outputs'
-AUTHORITATIVE_BLENDER = Path(r'D:\MMD\blender\goo-engine-experimental-4_4\blender.exe')
+AUTHORITATIVE_BLENDER = testenv.goo_exe()
 DEFAULT_MANIFEST = OUTPUTS / 'frozen' / 'final_20261117_111740' / 'source_manifest.json'
 SCHEMA = 'authored-mesh.v3-shape-attribute-uv-structure'
 MESH_ERROR = '原骨 rest/网格/渲染挂接被外部修改'

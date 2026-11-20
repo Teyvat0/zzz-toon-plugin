@@ -19,10 +19,11 @@ from types import SimpleNamespace
 
 sys.dont_write_bytecode = True
 import bpy
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1])); import testenv
 
 ROOT = Path(__file__).resolve().parents[2]
-AUTHORITATIVE = Path(r'D:\MMD\blender\goo-engine-experimental-4_4\blender.exe')
-MMD_PARENT = Path(r'C:\Users\gyf20\AppData\Roaming\Blender Foundation\Blender\4.4\extensions\blender_org')
+AUTHORITATIVE = testenv.goo_exe()
+MMD_PARENT = testenv.mmd_parent()
 DOMAIN = '1: Face, 2: Eye, 3: Body'
 REPORT = {'schema': 'synthetic-shader-policy.v1', 'started_at_utc': datetime.now(timezone.utc).isoformat(),
           'status': 'running', 'cases': [], 'saved': False, 'rendered': False,

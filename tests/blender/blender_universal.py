@@ -2,19 +2,14 @@
 Fixture paths are never packaged into addon runtime or used as character profiles.
 """
 import bpy,sys,json,traceback
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1])); import testenv
 from pathlib import Path
 from datetime import datetime
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from mesh_signature_probe import capture
 KIND=sys.argv[sys.argv.index('--')+1] if '--' in sys.argv else 'evelyn'
-INPUTS={
- 'evelyn':(r'D:\MMD\模型\人物\伊芙琳_by_绝区零_630d71de799045678c911656844d3b75\伊芙琳.pmx',r'D:\MMD\HoyoToon-Assets-main\Zenless Zone Zero\ZZZ-Characters\evelyn-chevalier-a-moth-to-light'),
- 'astra':(r'D:\MMD\模型\人物\耀嘉音_by_绝区零_9e78c01eb6ef4d6f824d5d6a4b7f5210\耀嘉音.pmx',r'D:\MMD\HoyoToon-Assets-main\Zenless Zone Zero\ZZZ-Characters\astra-yao-scarlet-rock-chandelier\Scarlet Rock'),
- 'velina':(r'D:\MMD\模型\人物\维琳娜_by_绝区零_dbd71bbd269a01b0164ec59fc508280c\维琳娜6.pmx',r'D:\MMD\HoyoToon-Assets-main\Zenless Zone Zero\ZZZ-Characters\velina-airgid-elegant-silver-cascade-shade-of-leisure\Elegant Silver Cascade'),
- 'ye':(r'D:\MMD\模型\人物\叶瞬光皮肤_by_绝区零_d97a3a854fea33f2169a8773b6ad69c2\叶瞬光.pmx',r'D:\MMD\HoyoToon-Assets-main\Zenless Zone Zero\ZZZ-Characters\ye-shunguang-clouddrift-illumination-touch-of-dawnlight\Touch of Dawnlight'),
- 'remielle':(r'D:\MMD\模型\人物\3.1蕾米埃尔_by_绝区零_b01b5cf19c83a57d763b11a0995c74b3\蕾米埃尔-白\蕾米埃尔-白.pmx',r'D:\MMD\HoyoToon-Assets-main\Zenless Zone Zero\ZZZ-Characters\remielle-dan-feathered-murmurs-seashade-pas-seul\Feathered Murmurs'),
-}
+INPUTS=testenv.fixtures()
 PMX,RESOURCE=INPUTS[KIND];PMX=Path(PMX)
 O=ROOT/'test_outputs'/KIND/datetime.now().strftime('%Y%m%d_%H%M%S_%f');O.mkdir(parents=True,exist_ok=False)
 R={'kind':KIND,'status':'running','reader':bpy.app.version_string,'checks':[]}
@@ -27,7 +22,7 @@ try:
  R['production_source_manifest']=source_manifest
  sys.path.insert(0,str(ROOT));import zzz_mmd_toon;zzz_mmd_toon.register()
  from zzz_mmd_toon import workflow,validation,mmd_adapter,ui,game_bridge
- sys.path.insert(0,r'C:\Users\gyf20\AppData\Roaming\Blender Foundation\Blender\4.4\extensions\blender_org')
+ sys.path.insert(0,str(testenv.mmd_parent()))
  import mmd_tools;mmd_tools.register()
  bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
  original_hash=validation.file_hash(PMX)

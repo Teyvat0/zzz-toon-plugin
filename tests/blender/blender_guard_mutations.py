@@ -9,7 +9,7 @@ Run from an otherwise disposable Goo Engine 4.4 process, for example::
 ``-- astra`` chooses that fixture's latest.json.  ``-- evelyn --artifact PATH``
 (or ``-- evelyn PATH``) accepts only a .blend below test_outputs/evelyn; it is
 an escape hatch while the integration runner has not published a usable latest.
-No PMX import, user-original .blend, checkpoint open, save, render, dsh import,
+No PMX import, user-original .blend, checkpoint open, save, render,
 fixture fabrication, or guard-baseline rewrite is performed by this test.
 
 Negative cases: native group identity and instance mute; all four exposed native
@@ -42,11 +42,12 @@ import uuid
 sys.dont_write_bytecode = True
 
 import bpy
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1])); import testenv
 
 
 ROOT = Path(__file__).resolve().parents[2]
 OUTPUTS = ROOT / 'test_outputs'
-MMD_PARENT = Path(r'C:\Users\gyf20\AppData\Roaming\Blender Foundation\Blender\4.4\extensions\blender_org')
+MMD_PARENT = testenv.mmd_parent()
 KINDS = ('evelyn', 'astra')
 EXPECTED_GUARDS = (
     '原骨 rest/网格/渲染挂接被外部修改',
@@ -571,7 +572,7 @@ def main():
               'protected_hashes': {str(Path(__file__).resolve()): sha256(__file__)}, 'forbidden_operations': [],
               'limits': ['Real Blender regression required; source author only performed in-memory Python syntax compilation',
                          'Uses generated test artifacts only; no PMX import or user-original blend is opened',
-                         'No save, render, pixel comparison, physics build, native Morph binding, or dsh runtime dependency',
+                         'No save, render, pixel comparison, physics build, native Morph binding, or external runtime dependency',
                          'Existing MaterialMorph retarget is skipped only when no eligible existing entry exists',
                          'Stale saved guard hashes or invalid latest metadata fail baseline; the test never repairs fixtures']}
     failure = None
@@ -591,7 +592,7 @@ def main():
         require(Path(data['output']).resolve() == path.parent, 'Fixture was moved away from its generated output directory')
         require(data.get('version') == workflow.VERSION, 'Generated fixture guard version is stale; rebuild integration fixture')
         require(bpy.context.scene.name == data['scene'], 'Generated artifact did not reopen its configured render scene')
-        # Scene/shaders are code-built; nothing imports or needs dsh/K.
+        # Scene/shaders are code-built; nothing imports external tooling.
         for source in data['resource_hashes']:
             resolved = str(Path(source).resolve())
             report['protected_hashes'][resolved] = sha256(resolved)

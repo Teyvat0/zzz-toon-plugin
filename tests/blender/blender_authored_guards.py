@@ -2,7 +2,7 @@
 
 Only run with the authoritative Goo Engine 4.4.3, in a disposable process::
 
-    D:\\MMD\\blender\\goo-engine-experimental-4_4\\blender.exe \
+    blender.exe \
         --background --factory-startup --disable-autoexec --python-exit-code 1 \
         --python tests/blender/blender_authored_guards.py
 
@@ -29,12 +29,13 @@ import uuid
 
 sys.dont_write_bytecode = True
 import bpy
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1])); import testenv
 from mathutils import Matrix
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / 'zzz_mmd_toon' / 'validation.py'
 NORMAL_TEST = ROOT / 'tests' / 'blender' / 'blender_normal_guards.py'
-AUTHORITATIVE_BLENDER = Path(r'D:\MMD\blender\goo-engine-experimental-4_4\blender.exe')
+AUTHORITATIVE_BLENDER = testenv.goo_exe()
 SCHEMA = 'authored-mesh.v3-shape-attribute-uv-structure'
 
 

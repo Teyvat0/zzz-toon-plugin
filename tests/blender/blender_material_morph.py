@@ -2,6 +2,7 @@
 Opens only a generated test artifact; never writes a .blend or changes baselines.
 """
 import bpy,sys,json,traceback,math
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1])); import testenv
 from pathlib import Path
 from datetime import datetime
 from types import SimpleNamespace
@@ -23,7 +24,7 @@ def difference(a,b):
 try:
  check('correct_goo',bpy.app.version[:2]==(4,4) and 'Goo' in bpy.app.version_string)
  sys.path.insert(0,str(ROOT));import zzz_mmd_toon;zzz_mmd_toon.register()
- sys.path.insert(0,r'C:\Users\gyf20\AppData\Roaming\Blender Foundation\Blender\4.4\extensions\blender_org');import mmd_tools;mmd_tools.register()
+ sys.path.insert(0,str(testenv.mmd_parent()));import mmd_tools;mmd_tools.register()
  from zzz_mmd_toon import workflow,validation,mmd_adapter
  from mmd_tools.core.shader import _MaterialMorph
  info=json.loads((ROOT/'test_outputs'/KIND/'latest.json').read_text(encoding='utf-8'))

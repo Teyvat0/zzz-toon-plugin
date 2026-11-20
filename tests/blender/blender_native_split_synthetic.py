@@ -3,6 +3,7 @@ Tests exact typed provenance and modern MaterialMorph migration in authoritative
 No PMX or existing blend is opened/saved. Artifacts are diagnostic JSON only.
 """
 import bpy, sys, json, traceback
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1])); import testenv
 from datetime import datetime
 from pathlib import Path
 from mathutils import Matrix
@@ -16,7 +17,7 @@ def check(name,value,detail=None):
 try:
     check('authoritative_goo',bpy.app.version[:3]==(4,4,3) and 'Goo' in bpy.app.version_string)
     sys.path.insert(0,str(ROOT));import zzz_mmd_toon
-    sys.path.insert(0,r'C:\Users\gyf20\AppData\Roaming\Blender Foundation\Blender\4.4\extensions\blender_org')
+    sys.path.insert(0,str(testenv.mmd_parent()))
     import mmd_tools;mmd_tools.register()
     from mmd_tools.core.model import Model
     from zzz_mmd_toon import native_split,validation

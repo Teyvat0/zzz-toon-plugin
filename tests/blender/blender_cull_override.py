@@ -2,6 +2,7 @@
 Usage: blender --factory-startup -b --python this.py -- PMX RESOURCE_DIR OUT_DIR
 """
 import bpy, sys, json
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1])); import testenv
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 PMX, RES, OUT = sys.argv[sys.argv.index('--') + 1:][:3]
@@ -9,7 +10,7 @@ sys.path.insert(0, str(ROOT))
 import zzz_mmd_toon
 zzz_mmd_toon.register()
 from zzz_mmd_toon import workflow, mmd_adapter, ui, user_mapping
-sys.path.insert(0, r'C:\Users\gyf20\AppData\Roaming\Blender Foundation\Blender\4.4\extensions\blender_org')
+sys.path.insert(0, str(testenv.mmd_parent()))
 import mmd_tools
 mmd_tools.register()
 bpy.ops.object.select_all(action='SELECT'); bpy.ops.object.delete(use_global=False)

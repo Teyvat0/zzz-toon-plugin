@@ -2,7 +2,7 @@
 
 Parent-run entry (authoritative Goo Engine 4.4.3, disposable process)::
 
-    D:\\MMD\\blender\\goo-engine-experimental-4_4\\blender.exe \
+    blender.exe \
         --background --factory-startup --disable-autoexec --python-exit-code 1 \
         --python tests/blender/blender_normal_guards.py \
         -- evelyn [--artifact ABSOLUTE_GENERATED_TEST_BLEND]
@@ -45,12 +45,13 @@ import uuid
 
 sys.dont_write_bytecode = True
 import bpy
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1])); import testenv
 
 ROOT = Path(__file__).resolve().parents[2]
 OUTPUTS = ROOT / 'test_outputs'
 SCHEMA = 'authored-mesh.v3-shape-attribute-uv-structure'
-AUTHORITATIVE_BLENDER = Path(r'D:\MMD\blender\goo-engine-experimental-4_4\blender.exe')
-MMD_PARENT = Path(r'C:\Users\gyf20\AppData\Roaming\Blender Foundation\Blender\4.4\extensions\blender_org')
+AUTHORITATIVE_BLENDER = testenv.goo_exe()
+MMD_PARENT = testenv.mmd_parent()
 ATTRIBUTES = (('custom_normal', 'INT16_2D', 'CORNER'),
               ('sharp_edge', 'BOOLEAN', 'EDGE'), ('sharp_face', 'BOOLEAN', 'FACE'))
 CANCEL_PAIR = (-24575, -24575)  # Test-only raw storage witness, never a decoded/generated normal.

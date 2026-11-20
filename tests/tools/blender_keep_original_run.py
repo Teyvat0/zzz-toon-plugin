@@ -2,6 +2,7 @@
 Usage: blender -b --python this.py -- <kind> <pmx> <resource_dir> [render:0|1]
 """
 import bpy, sys, json, traceback
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1])); import testenv
 from pathlib import Path
 from datetime import datetime
 ROOT = Path(__file__).resolve().parents[2]
@@ -23,7 +24,7 @@ try:
     import zzz_mmd_toon
     zzz_mmd_toon.register()
     from zzz_mmd_toon import workflow, validation, mmd_adapter
-    sys.path.insert(0, r'C:\Users\gyf20\AppData\Roaming\Blender Foundation\Blender\4.4\extensions\blender_org')
+    sys.path.insert(0, str(testenv.mmd_parent()))
     import mmd_tools
     mmd_tools.register()
     bpy.ops.object.select_all(action='SELECT'); bpy.ops.object.delete(use_global=False)

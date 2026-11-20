@@ -116,3 +116,9 @@ blender --factory-startup -b --python tests/blender/blender_zip_install.py -- /�
 - 插件代码（`zzz_mmd_toon/`、`build_release.py`、`tests/`）以 **GPL-3.0-or-later** 发布，全文见 [LICENSE](LICENSE)。
 - Toon 着色器的节点组（`ZZZ_Toon_Core`、`ZZZ_Toon_Maps`、`ZZZ_Toon_Outline`）另以 **CC BY 4.0** 发布，见 [zzz-toon-shader](https://github.com/Teyvat0/zzz-toon-shader)。插件里的 `toon_*.py` 是它的代码生成版本，随插件按 GPL 分发。
 - 「绝区零」及相关名称、角色和美术资源的权利归其权利人所有。本仓库不授予这些内容的再分发权，使用时请遵守模型、游戏资源和 MMD Tools 各自的条款。
+
+## 开发方式
+
+本插件的代码、测试与文档由 [dsh（DeepSeek Harness）](https://github.com/deepseek-ai/deepseek-harness) 驱动的 AI 编程代理完成，使用的模型有 Opus 5.5、Sonnet 5.5、GPT 6.1 Sol 和 DeepSeek V4.1 Flash。作者负责需求、方向与验收。
+
+[![](https://img.shields.io/badge/powered_by-dsh-4D6BFE?style=flat-square&logo=deepseek&logoColor=white)](https://github.com/deepseek-ai/deepseek-harness)

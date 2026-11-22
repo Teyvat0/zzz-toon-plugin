@@ -2,7 +2,7 @@
 bl_info = {
     'name': '仿ZZZ渲染 · MMD',
     'author': 'Teyvat0',
-    'version': (0, 2, 2),
+    'version': (0, 3, 0),
     'blender': (4, 4, 0),
     'location': '3D View > Sidebar > 仿ZZZ渲染',
     'description': '无角色白名单：PMX加对应游戏JSON/贴图，通用关联与渲染，保留原骨架和材质Morph',

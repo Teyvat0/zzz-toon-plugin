@@ -80,6 +80,19 @@ class UserMappingTests(unittest.TestCase):
             self.assertTrue(any('格式' in w for w in p['warnings']))
             self.assertEqual(p['rows'][0]['stem'], '')
 
+    def test_transparency_choice_roundtrips_and_auto_is_not_saved(self):
+        with tempfile.TemporaryDirectory() as d:
+            rows = [row(0, 'a', stem='A'), row(1, 'b', stem='A'), row(2, 'c', stem='A')]
+            rows[0]['transparency'] = 'ON'
+            rows[1]['transparency'] = 'OFF'
+            rows[2]['transparency'] = 'AUTO'
+            user_mapping.save(d, rows, {0: 'a', 1: 'b', 2: 'c'})
+            saved = json.loads((Path(d) / user_mapping.FILE).read_text(encoding='utf-8'))['slots']
+            self.assertEqual([s['slot'] for s in saved], [0, 1])
+            fresh = [row(0, 'a', stem='A'), row(1, 'b', stem='A'), row(2, 'c', stem='A')]
+            user_mapping.apply_saved(plan(fresh, d))
+            self.assertEqual([r.get('transparency') for r in fresh], ['ON', 'OFF', None])
+
 
 if __name__ == '__main__':
     unittest.main()

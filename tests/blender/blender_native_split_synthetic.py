@@ -40,7 +40,23 @@ try:
         for i,d in enumerate(uv.data):d.uv=(i/8.,(i%3)/4.)
     me.uv_layers.active_index=0;me.uv_layers[1].active_render=True;me.uv_layers[1].active_clone=True
     # Explicit authored normals, including present all-false sharp storage.
-    me.normals_split_custom_set([(0.,0.,1.)]*len(me.loops))
+    # Distinct non-axis normals: a uniform (0,0,1) survives a float round trip byte-for-byte
+    # and would hide MMD Tools >= 4.5 keep_normals re-encoding the INT16 custom_normal bytes.
+    import math
+    def _unit(i):
+        a=.37+i*.91;b=.21+i*.53
+        return (math.sin(a)*math.cos(b),math.sin(a)*math.sin(b),math.cos(a))
+    me.normals_split_custom_set([_unit(i) for i in range(len(me.loops))])
+    def _shading_normals(objects):
+        out={}
+        for o in objects:
+            m=o.data
+            for p in m.polygons:
+                for li in p.loop_indices:
+                    c=m.vertices[m.loops[li].vertex_index].co
+                    out[tuple(round(x,4) for x in (*c,*p.center))]=tuple(m.loops[li].normal)
+        return out
+    original_normals=_shading_normals([ob])
     for name,domain in (('sharp_edge','EDGE'),('sharp_face','FACE')):
         if me.attributes.get(name) is None:me.attributes.new(name,'BOOLEAN',domain)
     values={'FLOAT':.125,'INT':127,'FLOAT_VECTOR':(.1,.2,.3),'FLOAT_COLOR':(.1,.2,.3,.4),
@@ -61,6 +77,9 @@ try:
     parts,proof=native_split.separate(bpy.context,rig,root,arm,[ob],mats,'synthetic-proof-20261117')
     R['proof']=proof
     check('real_native_operator_and_exact_proof',proof['operator']=='mmd_tools.separate_by_materials' and proof['semantic_equivalence'] and len(parts)==2)
+    after_normals=_shading_normals(parts.values())
+    worst=max((math.degrees(math.acos(max(-1.,min(1.,sum(x*y for x,y in zip(v,original_normals[k])))))) for k,v in after_normals.items() if k in original_normals),default=999.)
+    check('custom_normal_bytes_and_shading_retained',len(after_normals)==len(original_normals)==6 and set(after_normals)==set(original_normals) and worst<.5,{'corners':len(after_normals),'worst_deg':worst})
     check('author_skeleton_unchanged',validation.skeleton(arm)==bones)
     check('original_material_ids_retained',[m.as_pointer() for m in mats]==original_materials and [m.mmd_material.material_id for m in mats]==[100,101])
     check('modern_morph_pointer_numeric_and_related_mesh',target.material_data==mats[1] and target.material_id==101 and any(target.related_mesh_data==p.data and mats[1] in p.data.materials.values() for p in parts.values()))

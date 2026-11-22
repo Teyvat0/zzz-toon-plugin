@@ -8,7 +8,7 @@ import hashlib
 import struct
 from collections import Counter
 import bpy
-from . import validation
+from . import compat, mmd_adapter, validation
 
 def _value(value):
     if hasattr(value,'to_list'):return value.to_list()
@@ -137,11 +137,30 @@ def _capture(ob,index,prefix):
     return record
 
 
+_STATE={'operator_ran':False,'mmd_tools':'unknown'}
+
+
 def _require(ok,message):
-    if not ok:raise RuntimeError('原生材质分离等价检查失败: '+message+'；请打开00完整回退点')
+    if not ok:
+        hint=compat.environment_hint(_STATE['mmd_tools']) if _STATE['operator_ran'] else ''
+        raise RuntimeError('原生材质分离等价检查失败: '+message+'；请打开00完整回退点'+hint)
 
 
 def separate(context,rig,root,arm,meshes,materials,owner):
+    """Check the installed MMD Tools first, then run the split; see _separate."""
+    _STATE.update(operator_ran=False,mmd_tools='unknown')
+    try:
+        module=mmd_adapter.native()[0]
+        _STATE['mmd_tools']=compat.mmd_tools_version(module)
+        # Fail before touching the scene when the installed operator lacks what we rely on.
+        compat.separate_kwargs(bpy.ops.mmd_tools.separate_by_materials.get_rna_type().properties.keys())
+    except RuntimeError as exc:
+        raise RuntimeError('MMD Tools %s 不兼容，场景未被修改: %s'%(_STATE['mmd_tools'],exc)) from exc
+    try:return _separate(context,rig,root,arm,meshes,materials,owner)
+    finally:_STATE['operator_ran']=False
+
+
+def _separate(context,rig,root,arm,meshes,materials,owner):
     """Actual sidebar-native operator; return parts + verifiable preparation report."""
     prefix='ZZZSplit_'+owner[:12]
     _require(not any(getattr(m,'data_type',None)=='DATA' for m in root.mmd_root.uv_morphs),'旧式UV Morph DATA索引未迁移；请先在独立文件完成原生转换并验证')
@@ -170,8 +189,8 @@ def separate(context,rig,root,arm,meshes,materials,owner):
         # MMD Tools >= 4.5 defaults keep_normals=True: it decodes normals to floats and
         # re-encodes them with normals_split_custom_set, which rewrites the authored INT16
         # custom_normal bytes. Disable it so Blender's native separate copies them verbatim.
-        kwargs={'clean_shape_keys':False}
-        if 'keep_normals' in bpy.ops.mmd_tools.separate_by_materials.get_rna_type().properties:kwargs['keep_normals']=False
+        kwargs=compat.separate_kwargs(bpy.ops.mmd_tools.separate_by_materials.get_rna_type().properties.keys())
+        _STATE['operator_ran']=True
         _require(bpy.ops.mmd_tools.separate_by_materials(**kwargs)=={'FINISHED'},'原生operator未完成')
     new=list(rig.meshes());seen={i:{d:Counter() for d in r['counts']} for i,r in records.items()}
     slot_by_material={m.as_pointer():i for i,m in enumerate(materials)};parts={};part_records=[];restored_attributes=[]

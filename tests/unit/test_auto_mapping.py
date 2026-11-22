@@ -1287,5 +1287,23 @@ class MMEEffectPolicyTests(MappingTestCase):
         self.assertNotIn('effect_policy',self.plan_effect(overlap=False)['rows'][1])
 
 
+class TransparentHintTests(unittest.TestCase):
+    def test_glass_names_on_body_slots_are_transparent(self):
+        for name in ('镜片', '眼镜片', 'glass', 'Lens_L', '薄纱', 'レンズ'):
+            self.assertTrue(mapping.looks_transparent(name, 'body'), name)
+
+    def test_low_pmx_alpha_on_body_or_wing_is_transparent(self):
+        self.assertTrue(mapping.looks_transparent('x', 'body', .5))
+        self.assertTrue(mapping.looks_transparent('x', 'wing', .5))
+
+    def test_ordinary_body_slots_stay_opaque(self):
+        for name in ('头饰', '饰', '肌2', '首', 'body'):
+            self.assertFalse(mapping.looks_transparent(name, 'body', 1.), name)
+
+    def test_other_roles_never_use_the_hint(self):
+        for role in ('hair', 'face', 'eye', 'eye_shadow'):
+            self.assertFalse(mapping.looks_transparent('镜片', role, .3), role)
+
+
 if __name__ == "__main__":
     unittest.main()

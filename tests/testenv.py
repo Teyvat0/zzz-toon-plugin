@@ -1,7 +1,7 @@
 """Machine-specific test configuration, read from environment variables.
 
 ZZZ_MMD_TOOLS_PARENT  directory that contains the `mmd_tools` package
-                      (default: the Blender 4.4 user extension repo "blender_org")
+                      (default: searches the Blender 4.4 user extension repos "blender_org" then "user_default")
 ZZZ_GOO_EXE           path of the Goo Engine 4.4.3 executable
                       (default: the running Blender when it reports "Goo")
 ZZZ_FIXTURES          JSON file {"kind": ["path/to/model.pmx", "path/to/resource_dir"]}
@@ -16,9 +16,14 @@ def mmd_parent():
     candidates = []
     if os.environ.get('ZZZ_MMD_TOOLS_PARENT'):
         candidates.append(Path(os.environ['ZZZ_MMD_TOOLS_PARENT']))
+    bases = []
     if os.environ.get('APPDATA'):
-        candidates.append(Path(os.environ['APPDATA']) / 'Blender Foundation' / 'Blender' / '4.4' / 'extensions' / 'blender_org')
-    candidates.append(Path.home() / '.config' / 'blender' / '4.4' / 'extensions' / 'blender_org')
+        bases.append(Path(os.environ['APPDATA']) / 'Blender Foundation' / 'Blender' / '4.4' / 'extensions')
+    bases.append(Path.home() / '.config' / 'blender' / '4.4' / 'extensions')
+    # Extensions installed from the online repo land in blender_org, drag-and-drop/disk installs in user_default.
+    for base in bases:
+        for repo in ('blender_org', 'user_default'):
+            candidates.append(base / repo)
     for path in candidates:
         if (path / 'mmd_tools').is_dir():
             return path

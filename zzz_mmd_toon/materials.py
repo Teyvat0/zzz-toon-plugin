@@ -390,8 +390,8 @@ def _discard_failed_build(materials, new_images):
 
 
 def build_material(resource_stem: str, role: str = "body", name: str | None = None,
-                   color_override=None, alpha_override=None, texture_overrides=None
-                   ) -> tuple[bpy.types.Material, bpy.types.Material, dict]:
+                   color_override=None, alpha_override=None, texture_overrides=None,
+                   transparent=False) -> tuple[bpy.types.Material, bpy.types.Material, dict]:
     """Build a fresh surface/outline pair from an exact JSON stem and role.
 
     ``color_override`` is display sRGB RGB(A); alpha_override is linear [0, 1].
@@ -510,7 +510,14 @@ def build_material(resource_stem: str, role: str = "body", name: str | None = No
                 "Face uses the JSON-referenced lightmap at UVMap and (1-u,v); "
                 "matching face UV and HeadCenter/HeadForward/HeadRight are workflow dependencies."
             )
-        toon_surface.wire(tree, core, maps, role, tex, p, color, alpha, caps)
+        transparent = bool(transparent) and role in _BODY_ROLES and role != "hair"
+        toon_surface.wire(tree, core, maps, role, tex, p, color, alpha, caps, transparent=transparent)
+        diagnostics["transparent"] = transparent
+        if transparent:
+            diagnostics["limits"].append(
+                "Transparent slot: opacity = live material Alpha x painted D.alpha "
+                "(Mix of Transparent BSDF and the toon surface, HASHED); no refraction."
+            )
         if role == "hair":
             inv = tree.nodes.new("ShaderNodeMath")
             inv.name = "Hair visibility = 1 - D.alpha"

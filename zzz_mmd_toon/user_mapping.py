@@ -42,8 +42,10 @@ def path_for(directory):
 def save(directory, rows, material_names):
     data = {'schema': SCHEMA, 'slots': [
         {'slot': int(r['slot']), 'name': material_names[int(r['slot'])],
-         'keep_original': bool(r.get('keep_original')), 'stem': r.get('stem') or '', 'cull': r.get('cull') or 'AUTO'}
-        for r in rows if r.get('user_selected') or r.get('keep_original') or r.get('cull') in ('ON', 'OFF')]}
+         'keep_original': bool(r.get('keep_original')), 'stem': r.get('stem') or '', 'cull': r.get('cull') or 'AUTO',
+         'transparency': r.get('transparency') or 'AUTO'}
+        for r in rows if r.get('user_selected') or r.get('keep_original')
+        or r.get('cull') in ('ON', 'OFF') or r.get('transparency') in ('ON', 'OFF')]}
     target = path_for(directory)
     target.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding='utf-8')
     return str(target)
@@ -80,6 +82,8 @@ def apply_saved(plan):
                 raise ValueError('name')
             if item.get('cull') in ('ON', 'OFF'):
                 row['cull'] = item['cull']
+            if item.get('transparency') in ('ON', 'OFF'):
+                row['transparency'] = item['transparency']
             if item.get('keep_original'):
                 keep(row)
             elif item.get('stem'):

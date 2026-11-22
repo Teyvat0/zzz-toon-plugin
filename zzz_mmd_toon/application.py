@@ -13,6 +13,12 @@ def _palette(outline, color):
     for i in range(1,6):shader.inputs['OutlineColor'+(str(i) if i>1 else '')].default_value=(*linear,1.)
 
 
+def is_transparent(row):
+    """ON/OFF are explicit user choices; AUTO follows the scan's glass/sheer evidence."""
+    mode = row.get('transparency', 'AUTO')
+    return mode == 'ON' or (mode == 'AUTO' and bool(row.get('transparent_auto')))
+
+
 def apply(parts, source_materials, rows, groups, directory, owner, outline_scale, root):
     materials.configure(directory,groups,owner)
     pending=[];used_hashes={};diagnostics=[]
@@ -23,7 +29,8 @@ def apply(parts, source_materials, rows, groups, directory, owner, outline_scale
             if row.get('keep_original'):continue
             surface,outline,info=materials.build_material(row['stem'],row['role'],
                 'ZZZ_Game_'+owner[:8]+'_'+str(row['slot']),alpha_override=1.,
-                color_override=row.get('color_override'),texture_overrides=row.get('texture_overrides'))
+                color_override=row.get('color_override'),texture_overrides=row.get('texture_overrides'),
+                transparent=is_transparent(row))
             pending.append((row,source,surface,outline,info))
             _palette(outline,row.get('palette') or PALETTES.get(row['role'],PALETTES['body']))
             info['binding_resolution']=row.get('resolution',{})
@@ -73,7 +80,7 @@ def apply(parts, source_materials, rows, groups, directory, owner, outline_scale
                 specs[index]={'material':mat,
                     'width':float(row['outline'])*outline_scale,'role':row['role'],
                     'enabled':bool(mat.mmd_material.enabled_toon_edge) and row['role'] not in NO_EDGE
-                              and not row.get('keep_original')}
+                              and not row.get('keep_original') and not is_transparent(row)}
             info=outline_geometry.attach(ob,specs,groups['LightHead'],owner)
             diagnostics.append({'object':ob.name,'per_face_outline':info})
         return diagnostics,used_hashes

@@ -1,0 +1,25 @@
+name: unit-tests
+
+# Pure-Python tests only. Blender/Goo integration tests under tests/blender need
+# Goo Engine 4.4.3 and MMD Tools and are run locally.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Release preflight (allow-list, version consistency)
+        run: python build_release.py --check
+        env:
+          PYTHONUTF8: '1'
+      - name: Unit tests
+        run: python -m unittest discover -s tests/unit -p "test_*.py" -v
+        env:
+          PYTHONUTF8: '1'

@@ -6,7 +6,7 @@ from pathlib import Path
 import bpy
 from . import mmd_adapter, renderer, transaction, validation, resources, materials, auto_mapping, game_bridge, outline_geometry, dependencies, user_mapping, normal_audit
 
-VERSION = '0.2.2'
+VERSION = '0.3.0'
 ROLE_SET = {'face','body','hair','wing','eye','eyebrow','eye_shadow','eye_shadow_texture','eye_highlight','mouth'}
 
 
@@ -89,7 +89,7 @@ def _mapping(plan, mapping):
                 raise RuntimeError('自动关联结果已被修改，请重新扫描；当前仅支持调整描边参数: role')
             if 'alpha' in override and abs(float(override['alpha'])-float(row.get('alpha',1.))) > 1e-6:
                 raise RuntimeError('原PMX Alpha由原生材质Morph控制，不能在映射表覆盖')
-            for key in ('outline','palette','cull'):
+            for key in ('outline','palette','cull','transparency'):
                 if key in override: row[key] = override[key]
     if len(rows) != len(plan['material_names']) or {r['slot'] for r in rows} != set(range(len(rows))):
         raise RuntimeError('原始材质槽发生变化，请重新扫描')
@@ -111,6 +111,8 @@ def _mapping(plan, mapping):
         row.setdefault('alpha', plan['rows'][slot].get('alpha', 1.))
         row.setdefault('outline', .34)
         if row.get('cull') not in ('AUTO','ON','OFF'): row['cull'] = 'AUTO'
+        if row.get('transparency') not in ('AUTO','ON','OFF'): row['transparency'] = 'AUTO'
+        row.setdefault('transparent_auto', plan['rows'][slot].get('transparent_auto', False))
         if row['state'] not in {'AUTO','OPAQUE','BLEND','CLIP','HASHED'}:
             row['state'] = 'AUTO'
         if not math.isfinite(float(row['alpha'])) or not 0 <= float(row['alpha']) <= 1:
@@ -127,7 +129,7 @@ def _mapping_digest(rows):
     # Evidence/diagnostics are not user controls. Float properties roundtrip as f32.
     return validation.digest([{k: ([round(float(x),6) for x in r[k]] if k == 'palette' and r.get(k) else
                                     round(float(r.get(k,1. if k == 'alpha' else 0.)),6) if k in {'alpha','outline'} else r.get(k))
-                               for k in ('slot','name','stem','role','backend','state','alpha','outline','palette','cull')}
+                               for k in ('slot','name','stem','role','backend','state','alpha','outline','palette','cull','transparency')}
                               for r in sorted(rows,key=lambda x:x['slot'])])
 
 

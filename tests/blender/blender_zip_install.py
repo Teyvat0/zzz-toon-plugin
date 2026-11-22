@@ -17,7 +17,7 @@ All installation, reports, checkpoints, saved projects and renders stay in the
 unique user_scripts parent. Existing reports are not overwritten. The addon is
 installed/enabled with preferences operators, never loaded from its source tree.
 Native MMD Tools remains an independently installed test prerequisite. The test
-imports PMX through its normal user-side API; installed addon 0.2.2 must then run
+imports PMX through its normal user-side API; installed addon 0.3.0 must then run
 mmd_tools.separate_by_materials(clean_shape_keys=False) BEFORE shading, prove exact
 original-index provenance, and save the distinct 01 pre-shading checkpoint. New
 Object/Mesh IDs are expected: only the post-split authored mesh is a strict guard
@@ -234,7 +234,7 @@ def zip_manifest(report, archive):
             source = SOURCE / Path(rel)
             require(source.is_file() and sha256(source) == value, 'ZIP bytes differ from current source: ' + raw)
             expected[rel] = value
-    required = {'__init__.py', 'ui.py', 'workflow.py', 'renderer.py', 'renderer_scene.py', 'renderer_rim.py', 'light_head.py', 'mmd_adapter.py', 'native_split.py', 'validation.py', 'user_mapping.py',
+    required = {'__init__.py', 'ui.py', 'workflow.py', 'renderer.py', 'renderer_scene.py', 'renderer_rim.py', 'light_head.py', 'mmd_adapter.py', 'native_split.py', 'validation.py', 'user_mapping.py', 'ui_text.py', 'compat.py',
                 'resources.py', 'auto_mapping.py', 'materials.py', 'game_bridge.py', 'outline_geometry.py',
                 'application.py', 'dependencies.py', 'transaction.py'}
     check(report, 'zip_required_universal_files_present', required.issubset(expected), sorted(required - set(expected)))
@@ -350,7 +350,7 @@ def check_strict_baseline(report, workflow, validation, root, data, label):
     before = counts()
     state, parts, _, arm = workflow._existing(bpy.context, root, data['resource_dir'], data['outline_scale'])
     check(report, label + '_post_split_strict_guard',
-          state == data and data['version'] == workflow.VERSION == '0.2.2'
+          state == data and data['version'] == workflow.VERSION == '0.3.0'
           and data['mesh_guard_schema'] == validation.MESH_GUARD_SCHEMA
           and validation.mesh_state(parts) == data['mesh']
           and validation.skeleton(arm) == data['skeleton']
@@ -504,8 +504,8 @@ def execute(args, output, scripts, report, protected):
     addon = importlib.import_module(PACKAGE)
     workflow, validation, adapter, renderer, ui = (importlib.import_module(PACKAGE + '.' + name)
                                                  for name in ('workflow', 'validation', 'mmd_adapter', 'renderer', 'ui'))
-    check(report, 'universal_addon_version', tuple(addon.bl_info['version']) == (0, 2, 2)
-          and workflow.VERSION == '0.2.2', {'addon': addon.bl_info['version'], 'workflow': workflow.VERSION})
+    check(report, 'universal_addon_version', tuple(addon.bl_info['version']) == (0, 3, 0)
+          and workflow.VERSION == '0.3.0', {'addon': addon.bl_info['version'], 'workflow': workflow.VERSION})
     default_bundle(report, addon, renderer, ui, installed, expected, 'first_enable')
     module_origins(report, installed, expected, 'first_enable')
     enable_native_mmd(report, protected, adapter)

@@ -39,6 +39,17 @@ def classify_name(name):
     return 'body'
 
 
+def looks_transparent(name, role, pmx_alpha=1.):
+    """Glass/sheer evidence for a body slot: material name token or PMX alpha < 1.
+
+    Only a hint (the row stays user-overridable): hair/eyes/face keep their own alpha rules."""
+    if role not in {'body','wing'}:return False
+    t = _text(name)
+    if any(x in t for x in ('镜片','鏡片','眼镜片','玻璃','透明','薄纱','レンズ','ガラス','lens','glass','sheer','transparent')):
+        return True
+    return float(pmx_alpha) < .999
+
+
 def _role_is_explicit(name, role):
     # classify_name's catch-all body is NOT independent semantic evidence. A
     # nameless/general overlay must compete across all proven donor domains.
@@ -452,6 +463,7 @@ def plan(materials, meshes, arm, resource_dir='') -> dict:
             name=result['material_names'][slot];role=classify_name(name);mmd=mat.mmd_material
             row={'slot':slot,'name':name,'stem':'','role':role,'role_evidence':'name-token' if _role_is_explicit(name,role) else 'default-unconstrained',
                  'state':'AUTO','alpha':float(mmd.alpha),
+                 'transparency':'AUTO','transparent_auto':looks_transparent(name,role,mmd.alpha),
                  'sourceAlpha':float(mmd.alpha),'outline':0. if role in NO_EDGE else .30 if role=='face' else .34 if role=='hair' else .38,
                  'palette':None,'archive':False,'backend':'GAME_JSON','confidence':0.,'evidence':[],'warnings':[],
                  'texture_overrides':{},'preserve_source_texture':False,'keep_original':False,'choices':[]}

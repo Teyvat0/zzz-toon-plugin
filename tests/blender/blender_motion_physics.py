@@ -573,8 +573,9 @@ def run(report, args, output):
         world.point_cache.frame_start, world.point_cache.frame_end = 1, max(world.point_cache.frame_end, 61)
         scene.frame_set(1)
         adapter.select_root(bpy.context, root)
-        result = bpy.ops.zzz_toon.build_physics()
-        check(report, 'actual_independent_sidebar_build_physics_finished', result == {'FINISHED'}, scene.zzz_toon.status)
+        # The sidebar button was removed (MMD Tools' own physics panel replaces it); the workflow API stays.
+        result = workflow.build_physics(bpy.context)
+        check(report, 'independent_build_physics_finished', bool(result.get('status')), result)
         physical_validation = adapter.validate_physics(bpy.context, rig, root, arm)
         check(report, 'native_imported_rigid_joint_inventory_unchanged', native_inventory(rig) == baseline['native_physics'], physical_validation)
         if args.diagnostics:

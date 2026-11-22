@@ -150,9 +150,11 @@ def _face(g, core, p, tex, x, y):
     core.inputs['Terminator Glow'].default_value = FACE_TERMINATOR
 
 
-def wire(tree, core, maps, role, tex, p, color, alpha, caps):
+def wire(tree, core, maps, role, tex, p, color, alpha, caps, transparent=False):
     """tex: image nodes by purpose (main/light/data/data2, None when absent); p: parameters;
-    color: linear RGBA; alpha: float; caps: see wire_caps. Domain must already be set on core."""
+    color: linear RGBA; alpha: float; caps: see wire_caps. Domain must already be set on core.
+    transparent: glass/sheer slots (e.g. spectacle lenses) take their opacity from the
+    painted D.alpha. Other body slots never do: their D.alpha carries other data."""
     g = G(tree)
     x, y = core.location.x, core.location.y
     dom = core.inputs['Domain'].default_value
@@ -167,6 +169,8 @@ def wire(tree, core, maps, role, tex, p, color, alpha, caps):
     am.inputs[0].default_value = alpha
     am.inputs[1].default_value = 1.0
     if dom == 2 and role != 'eye_shadow' and tex.get('main'):   # eyes: live alpha x painted alpha
+        g.L(tex['main'].outputs['Alpha'], am.inputs[1])
+    elif transparent and tex.get('main'):   # glass: live alpha x painted alpha, same chain as eyes
         g.L(tex['main'].outputs['Alpha'], am.inputs[1])
     g.L(am.outputs[0], core.inputs['Alpha'])
     for key, dst in (('light', 'Light Tex'), ('data', 'Other Data'), ('data2', 'Other Data 2')):

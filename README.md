@@ -6,7 +6,7 @@
 
 > 本项目是同人性质的非官方项目，与米哈游无关。仓库不含任何角色模型、游戏贴图或游戏数据。
 
-当前版本 0.2.1，下载见 [Releases](https://github.com/Teyvat0/zzz-toon-plugin/releases)。着色器部分单独开源：[zzz-toon-shader](https://github.com/Teyvat0/zzz-toon-shader)。
+当前版本 0.2.2，下载见 [Releases](https://github.com/Teyvat0/zzz-toon-plugin/releases)。着色器部分单独开源：[zzz-toon-shader](https://github.com/Teyvat0/zzz-toon-shader)。
 
 ## 特性
 

@@ -6,7 +6,7 @@ from pathlib import Path
 import bpy
 from . import mmd_adapter, renderer, transaction, validation, resources, materials, auto_mapping, game_bridge, outline_geometry, dependencies, user_mapping, normal_audit
 
-VERSION = '0.2.1'
+VERSION = '0.2.2'
 ROLE_SET = {'face','body','hair','wing','eye','eyebrow','eye_shadow','eye_shadow_texture','eye_highlight','mouth'}
 
 

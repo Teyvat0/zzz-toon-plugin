@@ -1,4 +1,4 @@
-"""Build a unique local 0.2.1 package from a closed runtime allow-list.
+"""Build a unique local 0.2.2 package from a closed runtime allow-list.
 
 No models/game files/MMD Tools/obsolete backends. Integrity-only manifest is not a
 regression certificate. Existing packages and manifests are never overwritten.
@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 SOURCE = ROOT / 'zzz_mmd_toon'
 DIST = ROOT / 'dist'
-VERSION = (0, 2, 1)
+VERSION = (0, 2, 2)
 MODULES = ('__init__', 'application', 'auto_mapping', 'dependencies', 'game_bridge', 'light_head', 'lighting',
            'materials', 'mmd_adapter', 'normal_audit', 'native_split', 'outline_geometry', 'renderer',
            'renderer_rim', 'renderer_scene', 'resources', 'toon_build', 'toon_core', 'toon_lib', 'toon_maps', 'toon_outline',
@@ -85,7 +85,7 @@ def main():
                           'render_policy': render_policy}))
         return
     DIST.mkdir(parents=True, exist_ok=True)
-    basename = '仿ZZZ渲染_MMD_v0.2.1_通用原生分材质_' + args.label
+    basename = '仿ZZZ渲染_MMD_v0.2.2_通用原生分材质_' + args.label
     zip_path, manifest = DIST / (basename + '.zip'), DIST / (basename + '.manifest.json')
     if zip_path.exists() or manifest.exists():
         raise RuntimeError('Refuse to overwrite release artifact or manifest: ' + basename)

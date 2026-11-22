@@ -167,7 +167,12 @@ def separate(context,rig,root,arm,meshes,materials,owner):
     for ob in list(meshes):
         for selected in context.selected_objects:selected.select_set(False)
         ob.hide_set(False);ob.select_set(True);context.view_layer.objects.active=ob
-        _require(bpy.ops.mmd_tools.separate_by_materials(clean_shape_keys=False)=={'FINISHED'},'原生operator未完成')
+        # MMD Tools >= 4.5 defaults keep_normals=True: it decodes normals to floats and
+        # re-encodes them with normals_split_custom_set, which rewrites the authored INT16
+        # custom_normal bytes. Disable it so Blender's native separate copies them verbatim.
+        kwargs={'clean_shape_keys':False}
+        if 'keep_normals' in bpy.ops.mmd_tools.separate_by_materials.get_rna_type().properties:kwargs['keep_normals']=False
+        _require(bpy.ops.mmd_tools.separate_by_materials(**kwargs)=={'FINISHED'},'原生operator未完成')
     new=list(rig.meshes());seen={i:{d:Counter() for d in r['counts']} for i,r in records.items()}
     slot_by_material={m.as_pointer():i for i,m in enumerate(materials)};parts={};part_records=[];restored_attributes=[]
     for ob in new:
